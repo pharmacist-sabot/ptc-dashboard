@@ -1,191 +1,170 @@
-PTC Monitor Dashboard
-=====================
+<div align="center">
 
-A lightweight dashboard to track the Pharmacy and Therapeutics Committee (PTC) improvement plans.  
-Originally developed for Sarabost Hospital (HA II-6, Fiscal Year 2568). This repository contains a Vue 3 + TypeScript frontend that synchronizes progress data to and from a Google Sheets backend via Google Apps Script. The project is simple to deploy on Vercel.
+# PTC Monitor Dashboard
 
-Tech stack
-----------
-- Frontend: `Vue 3` + `TypeScript`
-- State management: `Pinia`
-- Styling: `Tailwind CSS v4`
-- HTTP client: `Axios`
-- Backend/API: Google Apps Script (GAS) reading/writing a Google Sheet
-- Hosting: `Vercel`
+**Pharmacy and Therapeutics Committee (PTC) Quality Improvement Tracker**  
+Originally developed for Sabot Hospital
 
-Overview
---------
-This dashboard helps the PTC team track status and progress for 12 actions across 3 improvement proposals (from HA reaccreditation). Progress and metadata are stored in a Google Sheet (sheet name: `ActionProgress`) and accessed via an Apps Script Web App. The frontend consumes the GAS web app as a simple JSON API (GET/POST).
+[![Vue.js](https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Pinia](https://img.shields.io/badge/Pinia-2.2-FFE56B?style=for-the-badge&logo=vue.js&logoColor=black)](https://pinia.vuejs.org/)
+[![Google Apps Script](https://img.shields.io/badge/GAS_Backend-API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/apps-script)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-High-level flow
-- The browser (Vue + TS) calls the GAS Web App via `axios` requests.
-- GAS uses `SpreadsheetApp` to read/write the `ActionProgress` sheet.
-- The sheet holds rows for each action with status, percentage complete, notes, and audit fields.
+[Report Bug](https://github.com/pharmacist-sabot/ptc-dashboard/issues) · [Request Feature](https://github.com/pharmacist-sabot/ptc-dashboard/issues)
 
-Project structure
------------------
-Top-level (important files and directories):
+</div>
 
-- `index.html`
-- `public/favicon.svg`
-- `src/`
-  - `main.ts` — application entry
-  - `App.vue` — root component and background effects
-  - `assets/main.css` — Tailwind configuration, tokens, animations
-  - `types/index.ts` — TypeScript interfaces
-  - `data/planData.ts` — static plan definitions + status configuration
-  - `composables/useCountUp.ts` — animated numeric counter
-  - `services/gasApi.ts` — Axios wrapper for calling GAS
-  - `stores/dashboard.ts` — Pinia store (state, sync, save)
-  - `components/` — UI components:
-    - `AppHeader.vue`, `SummaryCards.vue`, `GanttChart.vue`, `SparklineChart.vue`
-    - `ActionCard.vue` (inline edit), `ActionDetailPanel.vue` (slide-in editor)
-  - `views/DashboardView.vue` — main view with tabs and grid
-  - `gas/Code.gs` — Google Apps Script code that implements the backend API
-- `vercel.json`
-- `.env.example`
-- `.gitignore`
+---
 
-Installation (local development)
---------------------------------
+**PTC Monitor Dashboard** is a lightweight, serverless web application designed to track the progress of quality improvement plans within the Pharmacy Department. Built with **Vue 3** and **TypeScript**, it utilizes **Google Sheets** as a zero-cost database via **Google Apps Script (GAS)**, making it incredibly easy to deploy and maintain within healthcare organizations without requiring traditional backend infrastructure.
 
-1. Clone repository and install dependencies
+---
 
-    git clone https://github.com/YOUR_ORG/ptc-dashboard.git
-    cd ptc-dashboard
-    npm install
+## Table of Contents
 
-2. Prepare Google Apps Script (GAS)
+- [Overview & Features](#overview--features)
+- [System Architecture](#system-architecture)
+- [Getting Started](#getting-started)
+  - [1. Frontend Setup](#1-frontend-setup)
+  - [2. Backend Setup (Google Apps Script)](#2-backend-setup-google-apps-script)
+- [Deployment](#deployment)
+- [Database Schema](#database-schema)
+- [Security & Privacy](#security--privacy)
+- [Contributing](#contributing)
+- [License & Disclaimer](#license--disclaimer)
 
-   2.1 Create or open a Google Sheet
-   - Create a new Google Sheet (or use an existing one).
-   - The script will create a tab named `ActionProgress` if it does not exist.
+---
 
-   2.2 Open Apps Script editor
-   - In the Sheet: Extensions → Apps Script
-   - Replace the default code with the contents of `src/gas/Code.gs`.
+## Overview & Features
 
-   2.3 Deploy the script as a Web App
-   - Click "Deploy" → "New deployment"
-   - Select Type: Web app
-   - Description: PTC Dashboard API v1
-   - Execute as: Me (your email)
-   - Who has access: Anyone
-   - Deploy and copy the Web App URL (it looks like `https://script.google.com/macros/s/AKfycb.../exec`)
+This dashboard helps the PTC team track the status and progress of 12 critical actions across 3 improvement proposals. 
 
-   2.4 Test the API
-   - Open the deployed Web App URL in a browser. You should see a JSON response similar to:
+- **Clinical Dark Interface:** Designed for extended professional use with a high-contrast dark theme, custom EKG pulse animations, and integrated sparkline charts.
+- **Optimistic UI Updates:** Instant visual feedback when updating action statuses or progress, ensuring a responsive user experience while background synchronization occurs.
+- **Interactive Visualizations:** Features an automated Gantt chart for fiscal year tracking and a dynamic summary dashboard reflecting real-time progress.
+- **Smart Alerting:** Automatically filters and highlights tasks marked as "Blocked" or "Delayed" for immediate managerial attention.
+- **Zero-Cost Infrastructure:** Uses a Google Apps Script Web App to read and write directly to a Google Sheet, completely eliminating the need for server maintenance.
 
-       { "success": true, "data": [ { "id": "R1A1", "status": "not_started", ... } ] }
+---
 
-3. Configure environment variables
+## System Architecture
 
-    cp .env.example .env.local
+```mermaid
+graph LR
+    A[Vue 3 + Tailwind Client] <-->|Axios GET / POST| B(Google Apps Script Web App)
+    B <-->|SpreadsheetApp| C[(Google Sheets)]
+    
+    style A fill:#0f172a,stroke:#00d4aa,stroke-width:2px,color:#fff
+    style B fill:#1e40af,stroke:#60a5fa,stroke-width:2px,color:#fff
+    style C fill:#065f46,stroke:#34d399,stroke-width:2px,color:#fff
+```
 
-   Edit `.env.local` and set:
+- **Frontend:** Single Page Application (SPA) hosted on Vercel. Communicates via standard JSON APIs.
+- **Backend (GAS):** Parses HTTP requests, bypasses CORS preflight limitations using `application/x-www-form-urlencoded`, and executes read/write operations.
+- **Database:** Google Sheets (Sheet name: `ActionProgress`).
 
-    VITE_GAS_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+---
 
-   Keep this URL secret; treat it like an API endpoint credential.
+## Getting Started
 
-4. Run the development server
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- A Google Account (to create the backing Google Sheet and Apps Script)
 
-    npm run dev
+### 1. Frontend Setup
 
-   By default the app runs at `http://localhost:5173`.
+1. Clone the repository and install dependencies:
+   ```bash
+   git clone https://github.com/pharmacist-sabot/ptc-dashboard.git
+   cd ptc-dashboard
+   npm install
+   ```
+2. Set up your local environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. Start the development server (Note: You must complete the GAS setup below and update `VITE_GAS_URL` in your `.env.local` before the app can fetch data):
+   ```bash
+   npm run dev
+   ```
 
-Deployment (Vercel)
--------------------
-Two recommended approaches:
+### 2. Backend Setup (Google Apps Script)
 
-- Vercel CLI
+1. Create a new **Google Sheet**.
+2. Navigate to **Extensions > Apps Script**.
+3. Replace the default code with the contents of [`src/gas/Code.gs`](src/gas/Code.gs).
+4. Save the project.
+5. Click **Deploy > New deployment**.
+   - **Select type:** Web app
+   - **Execute as:** Me (your email address)
+   - **Who has access:** Anyone
+6. Click **Deploy** and authorize the required permissions.
+7. Copy the generated **Web app URL**.
+8. Paste the URL into your `.env.local` file:
+   ```env
+   VITE_GAS_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+   ```
 
-    npm i -g vercel
-    vercel
-    # Answer prompts: framework = Vite, output = dist
+---
 
-- GitHub integration (recommended)
-  1. Push the repository to GitHub.
-  2. On vercel.com, create a New Project and import the repo.
-  3. Set Framework Preset: Vite.
-  4. In Project Settings → Environment Variables, add:
-       Name: `VITE_GAS_URL`
-       Value: `https://script.google.com/macros/s/YOUR_ID/exec`
-  5. Redeploy so the environment variable takes effect.
+## Deployment
 
-Vercel will auto-deploy on pushes to the primary branch if configured.
+The project is pre-configured for seamless deployment on **Vercel** via the included `vercel.json` file.
 
-Usage
------
-- Syncing: Click the header "sync — HH:MM" button to fetch the latest data from Google Sheets. The app performs an initial sync automatically on load.
-- Updating status:
-  - Inline quick edits: Use the controls on each `ActionCard` (status dropdown and progress slider). Edits are saved to the sheet immediately (optimistic updates).
-  - Detail panel: Click any card to open the slide-in `ActionDetailPanel`. Provide status, progress percentage, `actualValue`, `notes`, and `blockers`, then click Save to persist to Google Sheets.
-- Navigation: Tabs filter the actions by proposal (All / Proposal 1 / Proposal 2 / Proposal 3). The Alerts tab shows items with status `blocked` or `delayed`.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYOUR_ORG%2Fptc-dashboard&env=VITE_GAS_URL)
 
-Google Sheets schema
---------------------
-Sheet name: `ActionProgress`
+**Manual Vercel Deployment:**
+1. Push your code to a GitHub repository.
+2. Import the repository into your Vercel dashboard.
+3. Ensure the Framework Preset is set to **Vite**.
+4. In the **Environment Variables** section, add:
+   - Name: `VITE_GAS_URL`
+   - Value: `[Your GAS Web App URL]`
+5. Click **Deploy**.
 
-Columns (per-row):
-- `id` (string) — Action ID, e.g. `R1A1`–`R3A4`
-- `status` (string) — `not_started`, `in_progress`, `completed`, `delayed`, `blocked`
-- `progressPct` (number) — 0–100
-- `actualValue` (string) — measured / recorded value
-- `notes` (string) — free-text notes
-- `blockers` (string) — obstacles or risks
-- `lastUpdated` (ISO string) — timestamp of last update
-- `updatedBy` (string) — user name or identifier that updated the row
+---
 
-Action ID reference
--------------------
-- `R1A1` — Proposal 1 — Establish / review Medication Safety Team roles
-- `R1A2` — Proposal 1 — Create QI plan for medication management
-- `R1A3` — Proposal 1 — Improve proactive ME reporting and analysis
-- `R1A4` — Proposal 1 — Review professional pharmacy standards
-- `R2A1` — Proposal 2 — Review and update HAD policy
-- `R2A2` — Proposal 2 — Develop Medication Reconciliation system
-- `R2A3` — Proposal 2 — Conduct Drug Use Evaluation (DUE)
-- `R2A4` — Proposal 2 — Monitor ADR Type A and review prescriptions
-- `R3A1` — Proposal 3 — Review emergency reserve medicines system
-- `R3A2` — Proposal 3 — Review controlled substances and narcotics procedures
-- `R3A3` — Proposal 3 — Define after-hours medication dispensing procedures
-- `R3A4` — Proposal 3 — Perform ward stock audits
+## Database Schema
 
-Security considerations
------------------------
-- The GAS Web App is typically deployed with "Execute as: Me", so the script operates under the deployer's account permissions.
-- The GAS Web App URL is a sensitive endpoint. Do not commit the URL to a public repository. Use Vercel environment variables or other secret management.
-- If you need authentication, set "Who has access" to "Anyone with Google account" and implement token checks (example: a Bearer token header in `gasApi.ts`).
-- Limit sheet permissions: keep the backing Google Sheet within the organization account and restrict editing to authorized accounts.
+Upon the first API execution, the Google Apps Script will automatically generate a sheet named `ActionProgress` with the following columns:
 
-Troubleshooting
----------------
-- Sync button returns an error: verify `VITE_GAS_URL` in `.env.local` (or Vercel env settings).
-- GAS returns 401: ensure GAS is deployed with an appropriate "Who has access" setting, or re-deploy after changing permissions.
-- Changes in `Code.gs` are not reflected: re-deploy the GAS Web App after code edits.
-- CORS errors: the Google Apps Script web app handles cross-origin headers for simple GET/POST JSON APIs; double-check deployment.
-- Vercel build failures: ensure `VITE_GAS_URL` is defined in Vercel project environment variables.
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | Unique action identifier (e.g., `R1A1`, `R2A3`) |
+| `status` | String | `not_started`, `in_progress`, `completed`, `delayed`, `blocked` |
+| `progressPct`| Number | Completion percentage (0-100) |
+| `actualValue`| String | The actual recorded KPI value |
+| `notes` | String | Free-text operational notes |
+| `blockers` | String | Documented risks or obstacles |
+| `lastUpdated`| ISO Date| Timestamp of the last modification |
+| `updatedBy` | String | Identifier of the user making the update |
 
-Development notes
------------------
-- The frontend expects the GAS API to respond with a JSON object: `{ success: boolean, data: [...] }`.
-- `src/gas/Code.gs` contains the minimal endpoints required by the frontend: list entries, update an entry, and bulk sync.
-- The app performs optimistic UI updates for a responsive UX. Errors during save will be surfaced to the user and the state synchronized from the server.
+---
 
-Contributing
-------------
-This repository contains internal healthcare-related data and processes. If you plan to contribute:
-- Open an issue describing the change or feature.
-- For code changes, create a branch and submit a pull request with a concise description of the intent and impact.
-- Keep sensitive values out of commits (do not commit `.env.local` or real GAS URLs).
+## Security & Privacy
 
-License and usage policy
-------------------------
-This project was developed for Sarabost Hospital — Pharmacy Department. It contains design and operational data intended for internal use. Patient data or identifiable risk information must not be uploaded to or stored in this repository.
+- **Data Sensitivity:** This application is strictly intended for tracking operational processes and policy implementation. **Do not** store Protected Health Information (PHI), patient identifiers, or highly confidential institutional data in this system.
+- **Endpoint Protection:** Treat your GAS Web App URL as a sensitive credential. Do not commit it to public version control. Utilize proper secret management (e.g., Vercel Environment Variables).
+- **Access Control:** Restrict the sharing permissions of the backend Google Sheet to authorized personnel only.
 
-If you intend to publish or adapt this project publicly, obtain approval from the appropriate institutional authority and sanitize any sensitive content.
+---
 
-Contact
--------
-For questions about this repository, deployments, or Google Apps Script configuration, contact the project maintainer (Pharmacy Department, Sarabost Hospital).
+## Contributing
+
+Contributions to improve the application architecture, UI, or backend scripts are welcome.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## License & Disclaimer
+
+- This project was originally developed for internal process management at the **Sabot Hospital Pharmacy Department**.
+- The source code is provided as an open-source reference and can be adapted for your institution's requirements.
+- **Disclaimer:** The authors and associated institutions accept no liability for data loss, breaches, or operational failures resulting from the use or misconfiguration of this software. Always ensure compliance with your local healthcare data governance policies.
