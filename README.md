@@ -1,238 +1,191 @@
-# PTC Monitor Dashboard
-### ระบบติดตามแผนพัฒนาคุณภาพยา · โรงพยาบาลสระโบสถ์ · HA II-6 · ปีงบ 2568
+PTC Monitor Dashboard
+=====================
 
-> **Tech stack:** Vue 3 + TypeScript · Tailwind CSS v4 · Pinia · Axios · Google Apps Script · Vercel
+A lightweight dashboard to track the Pharmacy and Therapeutics Committee (PTC) improvement plans.  
+Originally developed for Sarabost Hospital (HA II-6, Fiscal Year 2568). This repository contains a Vue 3 + TypeScript frontend that synchronizes progress data to and from a Google Sheets backend via Google Apps Script. The project is simple to deploy on Vercel.
 
----
+Tech stack
+----------
+- Frontend: `Vue 3` + `TypeScript`
+- State management: `Pinia`
+- Styling: `Tailwind CSS v4`
+- HTTP client: `Axios`
+- Backend/API: Google Apps Script (GAS) reading/writing a Google Sheet
+- Hosting: `Vercel`
 
-## ภาพรวมระบบ
+Overview
+--------
+This dashboard helps the PTC team track status and progress for 12 actions across 3 improvement proposals (from HA reaccreditation). Progress and metadata are stored in a Google Sheet (sheet name: `ActionProgress`) and accessed via an Apps Script Web App. The frontend consumes the GAS web app as a simple JSON API (GET/POST).
 
-Dashboard สำหรับทีม PTC ติดตามแผนพัฒนา 12 แผน จาก 3 ข้อเสนอแนะ HA Reaccreditation  
-ข้อมูลความคืบหน้าเก็บใน **Google Sheets** (ผ่าน Apps Script API) และ deploy บน **Vercel**
+High-level flow
+- The browser (Vue + TS) calls the GAS Web App via `axios` requests.
+- GAS uses `SpreadsheetApp` to read/write the `ActionProgress` sheet.
+- The sheet holds rows for each action with status, percentage complete, notes, and audit fields.
 
-```
-Browser (Vue + TS)
-    │  axios GET/POST
-    ▼
-Google Apps Script Web App (Code.gs)
-    │  SpreadsheetApp
-    ▼
-Google Sheets — ActionProgress sheet
-    [id | status | progressPct | actualValue | notes | blockers | lastUpdated | updatedBy]
-```
+Project structure
+-----------------
+Top-level (important files and directories):
 
----
+- `index.html`
+- `public/favicon.svg`
+- `src/`
+  - `main.ts` — application entry
+  - `App.vue` — root component and background effects
+  - `assets/main.css` — Tailwind configuration, tokens, animations
+  - `types/index.ts` — TypeScript interfaces
+  - `data/planData.ts` — static plan definitions + status configuration
+  - `composables/useCountUp.ts` — animated numeric counter
+  - `services/gasApi.ts` — Axios wrapper for calling GAS
+  - `stores/dashboard.ts` — Pinia store (state, sync, save)
+  - `components/` — UI components:
+    - `AppHeader.vue`, `SummaryCards.vue`, `GanttChart.vue`, `SparklineChart.vue`
+    - `ActionCard.vue` (inline edit), `ActionDetailPanel.vue` (slide-in editor)
+  - `views/DashboardView.vue` — main view with tabs and grid
+  - `gas/Code.gs` — Google Apps Script code that implements the backend API
+- `vercel.json`
+- `.env.example`
+- `.gitignore`
 
-## โครงสร้างโปรเจค
+Installation (local development)
+--------------------------------
 
-```
-ptc-dashboard/
-├── index.html
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── main.ts                   # Entry point
-│   ├── App.vue                   # Root component + background effects
-│   ├── assets/
-│   │   └── main.css              # Tailwind v4 + design tokens + animations
-│   ├── types/
-│   │   └── index.ts              # TypeScript interfaces ทั้งหมด
-│   ├── data/
-│   │   └── planData.ts           # แผนงาน 3 ข้อ (static) + STATUS_CONFIG
-│   ├── composables/
-│   │   └── useCountUp.ts         # Animated number counter
-│   ├── services/
-│   │   └── gasApi.ts             # Axios calls → GAS
-│   ├── stores/
-│   │   └── dashboard.ts          # Pinia store (state, sync, save)
-│   ├── components/
-│   │   ├── AppHeader.vue         # Header + clock + sync button + progress bar
-│   │   ├── SummaryCards.vue      # KPI overview + circular progress + sparklines
-│   │   ├── GanttChart.vue        # Fiscal year Gantt timeline
-│   │   ├── SparklineChart.vue    # Mini SVG sparkline
-│   │   ├── ActionCard.vue        # Card พร้อม inline status/progress edit
-│   │   └── ActionDetailPanel.vue # Slide-in panel + บันทึก → GSheet
-│   ├── views/
-│   │   └── DashboardView.vue     # Main view (tabs, alert view, action grid)
-│   └── gas/
-│       └── Code.gs               # Google Apps Script backend
-├── vercel.json
-├── .env.example
-└── .gitignore
-```
+1. Clone repository and install dependencies
 
----
+    git clone https://github.com/YOUR_ORG/ptc-dashboard.git
+    cd ptc-dashboard
+    npm install
 
-## การติดตั้ง (Local Development)
+2. Prepare Google Apps Script (GAS)
 
-### 1. Clone และ Install
+   2.1 Create or open a Google Sheet
+   - Create a new Google Sheet (or use an existing one).
+   - The script will create a tab named `ActionProgress` if it does not exist.
 
-```bash
-git clone https://github.com/YOUR_ORG/ptc-dashboard.git
-cd ptc-dashboard
-npm install
-```
+   2.2 Open Apps Script editor
+   - In the Sheet: Extensions → Apps Script
+   - Replace the default code with the contents of `src/gas/Code.gs`.
 
-### 2. ตั้งค่า Google Apps Script
+   2.3 Deploy the script as a Web App
+   - Click "Deploy" → "New deployment"
+   - Select Type: Web app
+   - Description: PTC Dashboard API v1
+   - Execute as: Me (your email)
+   - Who has access: Anyone
+   - Deploy and copy the Web App URL (it looks like `https://script.google.com/macros/s/AKfycb.../exec`)
 
-#### 2.1 เปิด Google Sheet
-- สร้าง Google Sheet ใหม่ (หรือใช้ที่มีอยู่) ใน Google Drive
-- ตั้งชื่อ sheet ว่าอะไรก็ได้ (script จะสร้าง tab `ActionProgress` ให้เอง)
+   2.4 Test the API
+   - Open the deployed Web App URL in a browser. You should see a JSON response similar to:
 
-#### 2.2 เปิด Apps Script Editor
-- เมนู **Extensions → Apps Script**
-- ลบโค้ดเดิมทั้งหมดออก
-- วางโค้ดจากไฟล์ `src/gas/Code.gs` ลงไป
+       { "success": true, "data": [ { "id": "R1A1", "status": "not_started", ... } ] }
 
-#### 2.3 Deploy เป็น Web App
-```
-Deploy (ปุ่มบนขวา) → New deployment
-  Type: Web app
-  Description: PTC Dashboard API v1
-  Execute as: Me (your email)
-  Who has access: Anyone
-→ Deploy
-→ Copy the Web App URL
-```
+3. Configure environment variables
 
-> **หมายเหตุ:** URL จะมีรูปแบบ  
-> `https://script.google.com/macros/s/AKfycby.../exec`
+    cp .env.example .env.local
 
-#### 2.4 ทดสอบ API
-เปิด URL นั้นใน browser — ควรเห็น JSON:
-```json
-{ "success": true, "data": [ { "id": "R1A1", "status": "not_started", ... } ] }
-```
+   Edit `.env.local` and set:
 
-### 3. ตั้งค่า Environment Variable
+    VITE_GAS_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
 
-```bash
-cp .env.example .env.local
-```
+   Keep this URL secret; treat it like an API endpoint credential.
 
-แก้ไข `.env.local`:
-```env
-VITE_GAS_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
-```
+4. Run the development server
 
-### 4. Run Development Server
+    npm run dev
 
-```bash
-npm run dev
-# → http://localhost:5173
-```
+   By default the app runs at `http://localhost:5173`.
 
----
+Deployment (Vercel)
+-------------------
+Two recommended approaches:
 
-## Deploy บน Vercel
+- Vercel CLI
 
-### วิธีที่ 1 — Vercel CLI
-```bash
-npm i -g vercel
-vercel
-# ตอบคำถาม: framework = Vite, output = dist
-```
+    npm i -g vercel
+    vercel
+    # Answer prompts: framework = Vite, output = dist
 
-### วิธีที่ 2 — GitHub Integration (แนะนำ)
-1. Push โค้ดขึ้น GitHub repository
-2. เปิด [vercel.com](https://vercel.com) → New Project → Import repo
-3. Framework Preset: **Vite**
-4. ไปที่ **Settings → Environment Variables**:
-   ```
-   Name:  VITE_GAS_URL
-   Value: https://script.google.com/macros/s/YOUR_ID/exec
-   ```
-5. **Redeploy** เพื่อให้ env variable มีผล
+- GitHub integration (recommended)
+  1. Push the repository to GitHub.
+  2. On vercel.com, create a New Project and import the repo.
+  3. Set Framework Preset: Vite.
+  4. In Project Settings → Environment Variables, add:
+       Name: `VITE_GAS_URL`
+       Value: `https://script.google.com/macros/s/YOUR_ID/exec`
+  5. Redeploy so the environment variable takes effect.
 
-> Vercel จะ auto-deploy ทุกครั้งที่ push ไปที่ main branch
+Vercel will auto-deploy on pushes to the primary branch if configured.
 
----
+Usage
+-----
+- Syncing: Click the header "sync — HH:MM" button to fetch the latest data from Google Sheets. The app performs an initial sync automatically on load.
+- Updating status:
+  - Inline quick edits: Use the controls on each `ActionCard` (status dropdown and progress slider). Edits are saved to the sheet immediately (optimistic updates).
+  - Detail panel: Click any card to open the slide-in `ActionDetailPanel`. Provide status, progress percentage, `actualValue`, `notes`, and `blockers`, then click Save to persist to Google Sheets.
+- Navigation: Tabs filter the actions by proposal (All / Proposal 1 / Proposal 2 / Proposal 3). The Alerts tab shows items with status `blocked` or `delayed`.
 
-## วิธีใช้งาน Dashboard
+Google Sheets schema
+--------------------
+Sheet name: `ActionProgress`
 
-### การ Sync ข้อมูล
-- กด **"sync ล่าสุด HH:MM"** ที่ header เพื่อดึงข้อมูลล่าสุดจาก Google Sheets
-- ครั้งแรกที่เปิดหน้าเว็บจะ sync อัตโนมัติ
+Columns (per-row):
+- `id` (string) — Action ID, e.g. `R1A1`–`R3A4`
+- `status` (string) — `not_started`, `in_progress`, `completed`, `delayed`, `blocked`
+- `progressPct` (number) — 0–100
+- `actualValue` (string) — measured / recorded value
+- `notes` (string) — free-text notes
+- `blockers` (string) — obstacles or risks
+- `lastUpdated` (ISO string) — timestamp of last update
+- `updatedBy` (string) — user name or identifier that updated the row
 
-### การอัปเดตสถานะ (สองวิธี)
+Action ID reference
+-------------------
+- `R1A1` — Proposal 1 — Establish / review Medication Safety Team roles
+- `R1A2` — Proposal 1 — Create QI plan for medication management
+- `R1A3` — Proposal 1 — Improve proactive ME reporting and analysis
+- `R1A4` — Proposal 1 — Review professional pharmacy standards
+- `R2A1` — Proposal 2 — Review and update HAD policy
+- `R2A2` — Proposal 2 — Develop Medication Reconciliation system
+- `R2A3` — Proposal 2 — Conduct Drug Use Evaluation (DUE)
+- `R2A4` — Proposal 2 — Monitor ADR Type A and review prescriptions
+- `R3A1` — Proposal 3 — Review emergency reserve medicines system
+- `R3A2` — Proposal 3 — Review controlled substances and narcotics procedures
+- `R3A3` — Proposal 3 — Define after-hours medication dispensing procedures
+- `R3A4` — Proposal 3 — Perform ward stock audits
 
-**วิธีที่ 1 — Inline (เร็ว):**
-บน ActionCard → เปลี่ยน dropdown สถานะ หรือลาก slider ความคืบหน้า  
-ระบบจะ save ไปที่ Google Sheets ทันที (optimistic update)
+Security considerations
+-----------------------
+- The GAS Web App is typically deployed with "Execute as: Me", so the script operates under the deployer's account permissions.
+- The GAS Web App URL is a sensitive endpoint. Do not commit the URL to a public repository. Use Vercel environment variables or other secret management.
+- If you need authentication, set "Who has access" to "Anyone with Google account" and implement token checks (example: a Bearer token header in `gasApi.ts`).
+- Limit sheet permissions: keep the backing Google Sheet within the organization account and restrict editing to authorized accounts.
 
-**วิธีที่ 2 — Detail Panel (ครบถ้วน):**
-คลิกที่ card ใดก็ได้ → panel จะ slide in จากขวา  
-กรอก: สถานะ + ความคืบหน้า + ค่าจริงที่วัดได้ + บันทึก + อุปสรรค  
-กด **"บันทึก → Google Sheets"**
+Troubleshooting
+---------------
+- Sync button returns an error: verify `VITE_GAS_URL` in `.env.local` (or Vercel env settings).
+- GAS returns 401: ensure GAS is deployed with an appropriate "Who has access" setting, or re-deploy after changing permissions.
+- Changes in `Code.gs` are not reflected: re-deploy the GAS Web App after code edits.
+- CORS errors: the Google Apps Script web app handles cross-origin headers for simple GET/POST JSON APIs; double-check deployment.
+- Vercel build failures: ensure `VITE_GAS_URL` is defined in Vercel project environment variables.
 
-### Tab Navigation
-| Tab | แสดงผล |
-|-----|--------|
-| ทั้งหมด | ทุกแผนทั้ง 3 ข้อ |
-| ข้อที่ 1/2/3 | กรองเฉพาะข้อนั้น |
-| แจ้งเตือน 🔴 | เฉพาะรายการ "ติดขัด" และ "ล่าช้า" |
+Development notes
+-----------------
+- The frontend expects the GAS API to respond with a JSON object: `{ success: boolean, data: [...] }`.
+- `src/gas/Code.gs` contains the minimal endpoints required by the frontend: list entries, update an entry, and bulk sync.
+- The app performs optimistic UI updates for a responsive UX. Errors during save will be surfaced to the user and the state synchronized from the server.
 
----
+Contributing
+------------
+This repository contains internal healthcare-related data and processes. If you plan to contribute:
+- Open an issue describing the change or feature.
+- For code changes, create a branch and submit a pull request with a concise description of the intent and impact.
+- Keep sensitive values out of commits (do not commit `.env.local` or real GAS URLs).
 
-## Schema Google Sheets
+License and usage policy
+------------------------
+This project was developed for Sarabost Hospital — Pharmacy Department. It contains design and operational data intended for internal use. Patient data or identifiable risk information must not be uploaded to or stored in this repository.
 
-Sheet: `ActionProgress`
+If you intend to publish or adapt this project publicly, obtain approval from the appropriate institutional authority and sanitize any sensitive content.
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | string | R1A1–R3A4 |
-| status | string | not_started / in_progress / completed / delayed / blocked |
-| progressPct | number | 0–100 |
-| actualValue | string | ค่าจริงที่บันทึก |
-| notes | string | บันทึกความคืบหน้า |
-| blockers | string | อุปสรรค |
-| lastUpdated | ISO string | เวลาอัปเดตล่าสุด |
-| updatedBy | string | ชื่อผู้อัปเดต |
-
----
-
-## Action IDs Reference
-
-| ID | ข้อ | แผน |
-|----|-----|-----|
-| R1A1 | 1 | จัดตั้ง/ทบทวนบทบาท Medication Safety Team |
-| R1A2 | 1 | จัดทำ QI Plan ด้านระบบยา |
-| R1A3 | 1 | พัฒนาระบบรายงานและวิเคราะห์ ME เชิงรุก |
-| R1A4 | 1 | ทบทวนมาตรฐานวิชาชีพเภสัชกรรม |
-| R2A1 | 2 | ทบทวนและปรับ HAD Policy |
-| R2A2 | 2 | พัฒนาระบบ Medication Reconciliation |
-| R2A3 | 2 | ดำเนินการ DUE (Drug Use Evaluation) |
-| R2A4 | 2 | เฝ้าระวัง ADR Type A และทบทวนใบสั่งยา |
-| R3A1 | 3 | ทบทวนระบบยาสำรองฉุกเฉิน |
-| R3A2 | 3 | ทบทวนระบบยาเสพติดและยาควบคุมพิเศษ |
-| R3A3 | 3 | กำหนดแนวทางการจ่ายยานอกเวลา |
-| R3A4 | 3 | Ward Stock Audit |
-
----
-
-## Security Notes
-
-- GAS Web App ใช้ "Execute as: Me" ทำให้ Sheet อยู่ภายใต้ account ของคุณ
-- URL ของ GAS เป็น secret — ไม่ควร expose ใน public repo
-- ใช้ Vercel environment variables (ไม่ commit `.env.local`)
-- ถ้าต้องการ auth เพิ่ม: สามารถ restrict "Who has access" เป็น "Anyone with Google Account"  
-  แล้วเพิ่ม Bearer token header ใน `gasApi.ts`
-
----
-
-## Troubleshooting
-
-| ปัญหา | วิธีแก้ |
-|-------|---------|
-| ปุ่ม sync ขึ้น error | ตรวจสอบ `VITE_GAS_URL` ใน `.env.local` |
-| GAS ตอบ 401 | Redeploy GAS ด้วย "Anyone" access |
-| ข้อมูลไม่ update | ต้อง redeploy GAS ทุกครั้งที่แก้ Code.gs |
-| CORS error | GAS Web App ไม่ต้องตั้ง CORS (จัดการโดย Google) |
-| Build fail Vercel | ตรวจสอบ `VITE_GAS_URL` ใน Vercel env settings |
-
----
-
-## License
-
-Internal use — โรงพยาบาลสระโบสถ์ · ฝ่ายเภสัชกรรม  
-ห้ามเผยแพร่ข้อมูลผู้ป่วยหรือข้อมูลความเสี่ยงผ่านระบบนี้
+Contact
+-------
+For questions about this repository, deployments, or Google Apps Script configuration, contact the project maintainer (Pharmacy Department, Sarabost Hospital).
