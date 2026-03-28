@@ -130,15 +130,8 @@ function formatSync(d: Date | null) {
         style="background: rgba(180, 210, 80, 0.15)"
       />
 
-      <!-- Center title -->
-      <div class="flex-1 min-w-0 hidden md:block">
-        <p
-          class="text-sm font-medium truncate"
-          style="color: rgba(200, 230, 120, 0.65)"
-        >
-          ระบบติดตามแผนพัฒนาคุณภาพยา · ปีงบประมาณ 2568 · HA II-6
-        </p>
-      </div>
+      <!-- Center flex spacer -->
+      <div class="flex-1 min-w-0 hidden md:block"></div>
 
       <!-- Right section -->
       <div class="flex items-center gap-3 shrink-0">
