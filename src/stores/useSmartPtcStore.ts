@@ -1,17 +1,19 @@
+/* eslint-disable unicorn/filename-case */
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { fetchTable, updateTableRow, deleteTableRow } from '@/services/gas-api';
 
-export interface Meeting {
+import { fetchTable, updateTableRow } from '@/services/gas-api';
+
+export type Meeting = {
   id: string;
   date: string;
   title: string;
   status: 'scheduled' | 'active' | 'completed';
   reportUrl: string;
   lastUpdated?: string;
-}
+};
 
-export interface Agenda {
+export type Agenda = {
   id: string;
   meetingId: string;
   title: string;
@@ -19,7 +21,7 @@ export interface Agenda {
   description: string;
   resolution: string;
   lastUpdated?: string;
-}
+};
 
 export const useSmartPtcStore = defineStore('smartPtc', () => {
   const meetings = ref<Meeting[]>([]);
@@ -33,14 +35,16 @@ export const useSmartPtcStore = defineStore('smartPtc', () => {
     try {
       const [m, a] = await Promise.all([
         fetchTable('Meetings'),
-        fetchTable('Agendas')
+        fetchTable('Agendas'),
       ]);
       meetings.value = (m || []) as Meeting[];
       agendas.value = (a || []) as Agenda[];
-    } catch (err: any) {
+    }
+    catch (err: any) {
       error.value = err.message || 'Failed to load Smart PTC data';
       console.error(err);
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -52,13 +56,16 @@ export const useSmartPtcStore = defineStore('smartPtc', () => {
       const index = meetings.value.findIndex(m => m.id === meeting.id);
       if (index > -1) {
         meetings.value[index] = meeting;
-      } else {
+      }
+      else {
         meetings.value.push(meeting);
       }
-    } catch (err: any) {
+    }
+    catch (err: any) {
       error.value = err.message;
       throw err;
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -70,13 +77,16 @@ export const useSmartPtcStore = defineStore('smartPtc', () => {
       const index = agendas.value.findIndex(a => a.id === agenda.id);
       if (index > -1) {
         agendas.value[index] = agenda;
-      } else {
+      }
+      else {
         agendas.value.push(agenda);
       }
-    } catch (err: any) {
+    }
+    catch (err: any) {
       error.value = err.message;
       throw err;
-    } finally {
+    }
+    finally {
       loading.value = false;
     }
   }
@@ -93,6 +103,6 @@ export const useSmartPtcStore = defineStore('smartPtc', () => {
     loadData,
     saveMeeting,
     saveAgenda,
-    getAgendasForMeeting
+    getAgendasForMeeting,
   };
 });

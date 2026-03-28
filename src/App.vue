@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import AppHeader from '@/components/AppHeader.vue';
-import { useRoute } from 'vue-router';
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+import AppHeader from '@/components/AppHeader.vue';
 
 const route = useRoute();
 const isPrintView = computed(() => route.name === 'smart-ptc-meeting-print');
