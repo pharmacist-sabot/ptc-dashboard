@@ -29,11 +29,6 @@ function onStatusChange(e: Event) {
   store.saveAction(props.action.id, { status: val });
 }
 
-function onProgressChange(e: Event) {
-  const val = Number((e.target as HTMLInputElement).value);
-  store.saveAction(props.action.id, { progressPct: val });
-}
-
 const timeAgo = computed(() => {
   if (!props.action.lastUpdated)
     return null;
@@ -175,7 +170,7 @@ const statusDotColor: Record<ActionStatus, string> = {
           </span>
         </div>
 
-        <!-- Stacked bar + invisible slider -->
+        <!-- Stacked bar (View Only) -->
         <div class="relative" style="height: 22px">
           <!-- Visual track + fill -->
           <div
@@ -196,16 +191,6 @@ const statusDotColor: Record<ActionStatus, string> = {
               `"
             />
           </div>
-          <!-- Invisible range for interaction -->
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="5"
-            :value="action.progressPct"
-            class="absolute inset-0 w-full cursor-pointer opacity-0"
-            @change="onProgressChange"
-          >
         </div>
       </div>
 
