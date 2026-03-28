@@ -38,142 +38,76 @@ function formatSync(d: Date | null) {
 </script>
 
 <template>
-  <header
-    class="sticky top-0 z-40"
-    style="
-      background: linear-gradient(
-        135deg,
-        var(--color-header) 0%,
-        var(--color-header2) 100%
-      );
-      border-bottom: 1px solid rgba(180, 200, 80, 0.18);
-      box-shadow: 0 2px 16px rgba(10, 18, 4, 0.22);
-    "
-  >
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-[var(--color-border)] shadow-sm">
     <div class="max-w-screen-2xl mx-auto px-6 h-16 flex items-center gap-6">
-      <!-- Logo / Brand -->
-      <router-link to="/" class="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity">
-        <div class="relative w-10 h-10">
-          <div
-            class="absolute inset-0 rounded-xl"
-            style="
-              background: linear-gradient(
-                135deg,
-                var(--color-signal),
-                var(--color-pulse)
-              );
-              opacity: 0.22;
-            "
-          />
-          <div
-            class="absolute inset-0 rounded-xl flex items-center justify-center"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--color-pulse)"
-              stroke-width="2.2"
-            >
-              <path d="M12 2a10 10 0 1 0 10 10" stroke-opacity="0.5" />
-              <path d="M22 12A10 10 0 0 0 12 2" />
-              <circle
-                cx="12"
-                cy="12"
-                r="3"
-                fill="var(--color-pulse)"
-                stroke="none"
-              />
-            </svg>
-          </div>
+      
+      <!-- Brand -->
+      <router-link to="/" class="flex flex-col shrink-0 hover:opacity-80 transition-opacity">
+        <div class="font-black text-xl leading-none tracking-tight text-[var(--color-signal)]">
+          PTC Monitor
         </div>
-        <div>
-          <div
-            class="font-bold text-base leading-tight"
-            style="color: #c8e060; letter-spacing: 0.01em"
-          >
-            PTC Monitor
-          </div>
-          <div
-            class="text-xs leading-tight"
-            style="color: rgba(180, 210, 100, 0.55)"
-          >
-            รพ.สระโบสถ์
-          </div>
+        <div class="text-[0.65rem] font-bold tracking-wide uppercase mt-1 text-[var(--color-dim)]">
+          รพ.สระโบสถ์
         </div>
       </router-link>
 
       <!-- Navigation Links -->
-      <div class="flex items-center gap-4">
+      <nav class="flex items-center gap-2 ml-4">
         <router-link
           to="/"
-          class="text-sm font-medium transition-colors"
-          active-class="text-white"
-          style="color: rgba(200, 230, 120, 0.65)"
+          class="text-sm font-semibold transition-colors px-3 py-1.5 rounded-md text-[var(--color-dim)] hover:bg-[var(--color-surface)]"
+          active-class="text-[var(--color-signal)] bg-[var(--color-void)] border border-[var(--color-border)] shadow-sm"
         >
           Dashboard
         </router-link>
         <router-link
           to="/smart-ptc"
-          class="text-sm font-medium transition-colors"
-          active-class="text-white"
-          style="color: rgba(200, 230, 120, 0.65)"
+          class="text-sm font-semibold transition-colors px-3 py-1.5 rounded-md text-[var(--color-dim)] hover:bg-[var(--color-surface)]"
+          active-class="text-[var(--color-signal)] bg-[var(--color-void)] border border-[var(--color-border)] shadow-sm"
         >
           Smart PTC
         </router-link>
-      </div>
+      </nav>
 
       <!-- Separator -->
-      <div
-        class="h-8 w-px shrink-0 hidden md:block"
-        style="background: rgba(180, 210, 80, 0.15)"
-      />
+      <div class="h-6 w-px bg-[var(--color-border)] hidden md:block ml-2" />
 
       <!-- Center flex spacer -->
       <div class="flex-1 min-w-0 hidden md:block"></div>
 
       <!-- Right section -->
-      <div class="flex items-center gap-3 shrink-0">
+      <div class="flex items-center gap-4 shrink-0">
+        
         <!-- Overall progress pill -->
-        <div
-          class="hidden lg:flex items-center gap-2 px-4 py-2 rounded-full"
-          style="
-            background: rgba(92, 112, 32, 0.25);
-            border: 1px solid rgba(155, 180, 48, 0.3);
-          "
-        >
-          <div
-            class="w-2 h-2 rounded-full"
-            style="background: var(--color-pulse)"
-          />
-          <span class="text-sm" style="color: rgba(200, 230, 100, 0.7)">ภาพรวม</span>
-          <span class="num font-bold text-base" style="color: #c8e060">{{ summary.overallPct }}%</span>
+        <div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-[var(--color-void)] border border-[var(--color-border)] rounded-full shadow-inner">
+          <div class="w-2 h-2 rounded-full animate-pulse bg-[var(--color-pulse)]" />
+          <span class="text-xs font-semibold text-[var(--color-muted)]">ภาพรวม</span>
+          <span class="num font-bold text-sm text-[var(--color-signal)]">{{ summary.overallPct }}%</span>
         </div>
 
         <!-- Sync button -->
         <button
-          class="flex items-center gap-2 text-sm px-4 py-2 rounded-lg transition-all"
-          :style="
-            loading
-              ? 'color: #c8e060; background: rgba(92,112,32,0.25); border: 1px solid rgba(155,180,48,0.35);'
-              : 'color: rgba(180,210,80,0.6); background: rgba(255,255,255,0.05); border: 1px solid rgba(180,210,80,0.12);'
-          "
+          class="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full transition-all border shadow-sm"
+          :class="loading 
+            ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-dim)] cursor-wait' 
+            : 'bg-white border-[var(--color-border)] text-[var(--color-text-sub)] hover:bg-[var(--color-void)] hover:border-[var(--color-dim)]'"
           :disabled="loading"
           @click="store.syncFromSheet()"
         >
           <svg
-            class="w-4 h-4"
-            :class="{ 'animate-spin': loading }"
+            class="w-3.5 h-3.5"
+            :class="{ 'animate-spin text-[var(--color-pulse)]': loading }"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            <path d="M1 4v6h6M23 20v-6h-6" />
-            <path
-              d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"
-            />
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+            <path d="M16 21v-5h5" />
           </svg>
           <span class="hidden sm:inline">{{ formatSync(lastSync) }}</span>
         </button>
@@ -181,23 +115,16 @@ function formatSync(d: Date | null) {
         <!-- Error indicator -->
         <div
           v-if="error"
-          class="w-3 h-3 rounded-full animate-ping"
-          style="background: var(--color-danger)"
+          class="w-2.5 h-2.5 rounded-full animate-ping bg-[var(--color-danger)]"
           :title="error"
         />
 
         <!-- Clock -->
-        <div class="text-right hidden sm:block">
-          <div
-            class="num text-base font-semibold leading-tight"
-            style="color: #c8e060"
-          >
+        <div class="text-right hidden sm:block pl-3 border-l border-[var(--color-border)]">
+          <div class="num text-sm font-bold leading-tight text-[var(--color-signal)]">
             {{ formatTime(now) }}
           </div>
-          <div
-            class="text-xs leading-tight"
-            style="color: rgba(180, 210, 80, 0.5)"
-          >
+          <div class="text-[0.65rem] font-bold leading-tight text-[var(--color-muted)] uppercase mt-0.5">
             {{ formatDate(now) }}
           </div>
         </div>
@@ -205,17 +132,10 @@ function formatSync(d: Date | null) {
     </div>
 
     <!-- Bottom progress bar -->
-    <div style="height: 3px; background: rgba(92, 112, 32, 0.2)">
+    <div class="h-[3px] w-full bg-[var(--color-surface)]">
       <div
-        class="h-full"
-        style="
-          background: linear-gradient(
-            90deg,
-            var(--color-signal),
-            var(--color-pulse)
-          );
-          transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        "
+        class="h-full bg-[var(--color-signal)]"
+        style="transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);"
         :style="`width: ${summary.overallPct}%;`"
       />
     </div>
