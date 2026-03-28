@@ -5,14 +5,14 @@
   --font-sans: 'Prompt', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* ── Light Cream Palette ─────────────────────────── */
+  /* ── White/Olive Palette ─────────────────────────── */
 
-  /* Base surfaces – light bright parchment */
-  --color-void: #fffefb;
-  --color-deep: #fcf9f2;
-  --color-surface: #f4f0e6;
+  /* Base surfaces */
+  --color-void: #ffffff;
+  --color-deep: #fafafa;
+  --color-surface: #f3f4f0;
   --color-panel: #ffffff;
-  --color-border: #d8d2c2;
+  --color-border: #e2e4dc;
   --color-muted: #737c52;
   --color-dim: #444c26;
 
