@@ -52,7 +52,7 @@ function formatSync(d: Date | null) {
   >
     <div class="max-w-screen-2xl mx-auto px-6 h-16 flex items-center gap-6">
       <!-- Logo / Brand -->
-      <div class="flex items-center gap-3 shrink-0">
+      <router-link to="/" class="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity">
         <div class="relative w-10 h-10">
           <div
             class="absolute inset-0 rounded-xl"
@@ -102,11 +102,31 @@ function formatSync(d: Date | null) {
             รพ.สระโบสถ์
           </div>
         </div>
+      </router-link>
+
+      <!-- Navigation Links -->
+      <div class="flex items-center gap-4">
+        <router-link
+          to="/"
+          class="text-sm font-medium transition-colors"
+          active-class="text-white"
+          style="color: rgba(200, 230, 120, 0.65)"
+        >
+          Dashboard
+        </router-link>
+        <router-link
+          to="/smart-ptc"
+          class="text-sm font-medium transition-colors"
+          active-class="text-white"
+          style="color: rgba(200, 230, 120, 0.65)"
+        >
+          Smart PTC
+        </router-link>
       </div>
 
       <!-- Separator -->
       <div
-        class="h-8 w-px shrink-0"
+        class="h-8 w-px shrink-0 hidden md:block"
         style="background: rgba(180, 210, 80, 0.15)"
       />
 

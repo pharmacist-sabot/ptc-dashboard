@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import AppHeader from '@/components/AppHeader.vue';
-import DashboardView from '@/views/DashboardView.vue';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+const isPrintView = computed(() => route.name === 'smart-ptc-meeting-print');
 </script>
 
 <template>
-  <div class="noise-bg min-h-screen" style="background: var(--color-void)">
+  <div v-if="isPrintView">
+    <!-- Clean layout for print views -->
+    <router-view />
+  </div>
+  <div v-else class="noise-bg min-h-screen" style="background: var(--color-void)">
     <!-- Subtle grid pattern -->
     <div
       class="fixed inset-0 pointer-events-none"
       style="
         background-image:
-          linear-gradient(rgba(92, 112, 32, 0.045) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(92, 112, 32, 0.045) 1px, transparent 1px);
+          linear-gradient(rgba(92, 112, 32, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(92, 112, 32, 0.02) 1px, transparent 1px);
         background-size: 44px 44px;
         z-index: 0;
       "
@@ -23,7 +31,7 @@ import DashboardView from '@/views/DashboardView.vue';
       style="
         background: radial-gradient(
           ellipse at top right,
-          rgba(156, 176, 64, 0.1) 0%,
+          rgba(156, 176, 64, 0.05) 0%,
           transparent 68%
         );
         z-index: 0;
@@ -36,7 +44,7 @@ import DashboardView from '@/views/DashboardView.vue';
       style="
         background: radial-gradient(
           ellipse at bottom left,
-          rgba(92, 112, 32, 0.08) 0%,
+          rgba(92, 112, 32, 0.04) 0%,
           transparent 65%
         );
         z-index: 0;
@@ -49,7 +57,7 @@ import DashboardView from '@/views/DashboardView.vue';
       style="
         background: radial-gradient(
           ellipse at 50% 30%,
-          rgba(188, 172, 120, 0.06) 0%,
+          rgba(188, 172, 120, 0.03) 0%,
           transparent 60%
         );
         z-index: 0;
@@ -59,7 +67,7 @@ import DashboardView from '@/views/DashboardView.vue';
     <!-- Content -->
     <div class="relative z-10">
       <AppHeader />
-      <DashboardView />
+      <router-view />
     </div>
   </div>
 </template>

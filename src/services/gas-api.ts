@@ -23,6 +23,17 @@ export async function fetchProgress(): Promise<GSheetRow[]> {
   return data.data as GSheetRow[];
 }
 
+export async function fetchTable(tableName: string): Promise<any[]> {
+  const res = await fetch(`${GAS_URL}?t=${Date.now()}&table=${tableName}`, {
+    method: 'GET',
+    redirect: 'follow',
+  });
+  const data = await res.json();
+  if (!data.success)
+    throw new Error(data.error);
+  return data.data;
+}
+
 // ── POST helper — ส่งเป็น form-urlencoded (no preflight) ────
 async function gasPost(body: Record<string, string>): Promise<any> {
   const res = await fetch(GAS_URL, {
@@ -50,5 +61,21 @@ export async function bulkUpdateActions(
   await gasPost({
     action: 'bulkUpdate',
     payloads: JSON.stringify(payloads),
+  });
+}
+
+export async function updateTableRow(tableName: string, payload: any): Promise<void> {
+  await gasPost({
+    action: 'update',
+    table: tableName,
+    payload: JSON.stringify(payload),
+  });
+}
+
+export async function deleteTableRow(tableName: string, id: string): Promise<void> {
+  await gasPost({
+    action: 'delete',
+    table: tableName,
+    payload: JSON.stringify({ id }),
   });
 }

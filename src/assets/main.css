@@ -5,16 +5,16 @@
   --font-sans: 'Prompt', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* ── Olive Oil Pastel Palette ─────────────────────────── */
+  /* ── Light Cream Palette ─────────────────────────── */
 
-  /* Base surfaces – warm parchment */
-  --color-void: #f2efe2;
-  --color-deep: #edeadb;
-  --color-surface: #e4e1d2;
-  --color-panel: #fafaf3;
-  --color-border: #cdd09e;
-  --color-muted: #adb480;
-  --color-dim: #5e6a38;
+  /* Base surfaces – light bright parchment */
+  --color-void: #fdfbf7;
+  --color-deep: #f5f2ea;
+  --color-surface: #ebe5d8;
+  --color-panel: #ffffff;
+  --color-border: #d8d2c2;
+  --color-muted: #737c52;
+  --color-dim: #444c26;
 
   /* Primary olive signal */
   --color-signal: #5c7020;
@@ -36,9 +36,9 @@
   --color-header: #1e2a10;
   --color-header2: #28380f;
 
-  /* Text */
-  --color-text: #1e2910;
-  --color-text-sub: #3a4820;
+  /* Text - High contrast */
+  --color-text: #111709;
+  --color-text-sub: #252f14;
 }
 
 * {
