@@ -7,7 +7,7 @@ import { STATUS_CONFIG } from '@/data/plan-data';
 import { useDashboardStore } from '@/stores/dashboard';
 
 const props = defineProps<{ action: ActionItem | null; recColor: string }>();
-const emit = defineEmits<{ (e: 'close'): void }>();
+const emit = defineEmits<{ (_e: 'close'): void }>();
 const store = useDashboardStore();
 
 const localStatus = ref<ActionStatus>('not_started');
@@ -99,7 +99,7 @@ const statusColors: Record<
         box-shadow: -24px 0 60px rgba(30, 41, 16, 0.14);
       "
     >
-      <!-- ── Header ─────────────────────────────────── -->
+      <!-- Header -->
       <div
         class="shrink-0"
         style="border-bottom: 1px solid var(--color-border)"
@@ -159,7 +159,7 @@ const statusColors: Record<
         </div>
       </div>
 
-      <!-- ── Scrollable body ────────────────────────── -->
+      <!-- Scrollable body -->
       <div class="flex-1 overflow-y-auto p-5 space-y-5">
         <!-- Sub-items -->
         <div class="info-box">
@@ -315,7 +315,7 @@ const statusColors: Record<
 
         <hr style="border-color: var(--color-border)">
 
-        <!-- ── Edit section ─────────────────────────── -->
+        <!-- Edit section -->
         <div>
           <p
             class="text-base font-bold mb-4 flex items-center gap-2"
@@ -476,7 +476,7 @@ const statusColors: Record<
         </div>
       </div>
 
-      <!-- ── Footer ─────────────────────────────────── -->
+      <!-- Footer -->
       <div
         class="p-5 shrink-0 flex gap-3"
         style="border-top: 1px solid var(--color-border)"
