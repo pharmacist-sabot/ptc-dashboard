@@ -4,7 +4,7 @@ First off, thank you for considering contributing to the PTC Monitor Dashboard! 
 
 ## Where do I go from here?
 
-If you've noticed a bug or have a feature request, please [open an issue](https://github.com/pharmacist-sabot/ptc-dashboard/issues).
+If you've noticed a bug or have a feature request, please [open an issue](https://github.com/suradet-ps/ptc-dashboard/issues).
 
 ## Development Workflow
 
